@@ -10,14 +10,18 @@ let sorted = false;
 
 let startSorting = false;
 
-function createArray(windowWidth) {
-  for (i = 0; i < Math.floor(windowWidth / size); i++)
-    array.push(Math.floor(random(20, height - 100)));
-}
+let slider;
+
+const createArray = (windowWidth, size) => {
+  array = [];
+  for (let i = 0; i < Math.floor(windowWidth / size); i++)
+    // array.push(Math.floor(random(20, height - 100)));
+    array[i] = Math.floor(random(20, height - 100));
+};
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  createArray(windowWidth);
+  createArray(windowWidth, size);
   frameRate(fr);
 
   const sortButton = createButton("Sort!");
@@ -28,8 +32,14 @@ function setup() {
   );
   sortButton.mousePressed(() => {
     startSorting = true;
-    sortButton.style("display: none");
+    sortButton.style("color : grey; border-color: grey;");
+    sortButton.attribute("disabled", true);
+    slider.attribute("disabled", true);
   });
+
+  slider = createSlider(5, 100, 40, 0);
+  slider.position(windowWidth / 4, windowHeight - 40);
+  slider.style("width: 200px; background: rgba(200, 0, 200, 100);");
 }
 
 const sleep = () =>
@@ -41,6 +51,13 @@ const sleep = () =>
 
 async function draw() {
   background(50);
+
+  let change = slider.value();
+  if (change !== size) {
+    size = change;
+    createArray(windowWidth, change);
+  }
+
   for (let i = 0; i < array.length; i++) {
     stroke(200, 100, 100);
     fill(200, 0, 200, 100);
