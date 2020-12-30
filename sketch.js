@@ -11,6 +11,9 @@ let sorted = false;
 let startSorting = false;
 
 let slider;
+let sortButton;
+let selectFR;
+let swapCheckbox;
 
 const createArray = (windowWidth, size) => {
   array = [];
@@ -24,33 +27,62 @@ function setup() {
   createArray(windowWidth, size);
   frameRate(fr);
 
-  const sortButton = createButton("Sort!");
+  swapCheckbox = createCheckbox("  Enhance Swapping", false);
+  swapCheckbox.position(30, windowHeight - 40);
+  swapCheckbox.style("color: white;");
+  swapCheckbox.changed(() => {
+    apply_sleep = true;
+  });
+
+  sortButton = createButton("Sort!");
   sortButton.position(windowWidth / 2, windowHeight - 50);
   sortButton.size(90, 40);
   sortButton.style(
     "background-color : transparent; color : white; outline: none; border-color: rgb(200, 0, 200, 100); border-radius: 20px"
   );
+
+  slider = createSlider(5, 100, 40, 0);
+  slider.position(windowWidth / 4, windowHeight - 40);
+  slider.style("width: 200px; background: rgba(200, 0, 200, 100);");
+
+  speedtext = createP("Frame rate: ");
+  speedtext.position((2.8 * windowWidth - 80) / 4, windowHeight - 55);
+  speedtext.style("color: white");
+
+  selectFR = createSelect();
+  selectFR.style(
+    "background : transparent; color : white; outline: none; border-color: rgb(200, 0, 200, 100); border-radius: 20px; padding-right: 20px; padding-left: 20px; padding-top: 10px; padding-bottom: 10px"
+  );
+  selectFR.position((3 * windowWidth) / 4, windowHeight - 50);
+  selectFR.option("High");
+  selectFR.option("Medium");
+  selectFR.option("Low");
+
+  selectFR.changed(() => {
+    if (selectFR.value() === "High") fr = 300;
+    else if (selectFR.value() === "Medium") fr = 10;
+    else fr = 1;
+  });
+
   sortButton.mousePressed(() => {
     startSorting = true;
     sortButton.style("color : grey; border-color: grey;");
     sortButton.attribute("disabled", true);
     slider.attribute("disabled", true);
+    swapCheckbox.attribute("disabled", true);
   });
-
-  slider = createSlider(5, 100, 40, 0);
-  slider.position(windowWidth / 4, windowHeight - 40);
-  slider.style("width: 200px; background: rgba(200, 0, 200, 100);");
 }
 
 const sleep = () =>
   new Promise((resolve, _reject) => {
     setTimeout(function () {
-      resolve("Have a nap."); // Yay! Everything went well!
+      resolve("Have a nap.");
     }, 1250);
   });
 
 async function draw() {
   background(50);
+  frameRate(fr);
 
   let change = slider.value();
   if (change !== size) {
@@ -70,6 +102,7 @@ async function draw() {
 
   if (startSorting) {
     if (apply_sleep) await sleep();
+
     // BUBBLE SORT
 
     let swap;
