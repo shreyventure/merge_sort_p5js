@@ -93,6 +93,10 @@ async function draw() {
   for (let i = 0; i < array.length; i++) {
     stroke(200, 100, 100);
     fill(200, 0, 200, 100);
+    if (!(index_i < array.length - index_j - 1)) {
+      index_i = 0;
+      index_j++;
+    }
     if ((array[i] && array[i + 1] && i === index_i) || i === index_i + 1) {
       fill(200, 0, 10, 100);
     }
@@ -131,9 +135,6 @@ async function draw() {
         }
 
         index_i++;
-      } else {
-        index_i = 0;
-        index_j++;
       }
     } else {
       sorted = true;
