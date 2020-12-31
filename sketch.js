@@ -130,7 +130,10 @@ async function draw() {
               fill(10, 0, 100);
             }
             rect(i * size, 0, size, array[i]);
-            if (size >= 40) text(array[i], i * size + size / 4, array[i] - 10);
+            if (size >= 40) {
+              textSize(12);
+              text(array[i], i * size + size / 4, array[i] - 10);
+            }
           }
         }
 
