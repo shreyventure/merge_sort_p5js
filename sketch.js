@@ -1,5 +1,5 @@
-let index_i = 0;
-let index_j = 0;
+let index_i_select = 0;
+let index_j = 1;
 
 let size = 40; // size of the bars (40 or greater displays numbers)
 let apply_sleep = false; // enhances swap animation at low fr
@@ -18,7 +18,6 @@ let swapCheckbox;
 const createArray = (windowWidth, size) => {
   array = [];
   for (let i = 0; i < Math.floor(windowWidth / size); i++)
-    // array.push(Math.floor(random(20, height - 100)));
     array[i] = Math.floor(random(20, height - 100));
 };
 
@@ -28,31 +27,28 @@ function setup() {
   frameRate(fr);
 
   swapCheckbox = createCheckbox("  Enhance Swapping", false);
-  swapCheckbox.position(30, windowHeight - 40);
+  swapCheckbox.position(30, windowHeight - 45);
   swapCheckbox.style("color: white;");
   swapCheckbox.changed(() => {
     apply_sleep = true;
   });
+  swapCheckbox.attribute("class", "ml-2");
 
-  sortButton = createButton("Sort!");
+  sortButton = createButton("Sort !");
   sortButton.position(windowWidth / 2, windowHeight - 50);
-  sortButton.size(90, 40);
-  sortButton.style(
-    "background-color : transparent; color : white; outline: none; border-color: rgb(200, 0, 200, 100); border-radius: 20px"
-  );
+  sortButton.attribute("class", "btn btn-primary py-2 btn-sort");
 
-  slider = createSlider(5, 100, 40, 0);
+  slider = createSlider(3, 100, 40, 0);
+  slider.attribute("class", "custom-range");
+  slider.attribute("type", "range");
   slider.position(windowWidth / 4, windowHeight - 40);
-  slider.style("width: 200px; background: rgba(200, 0, 200, 100);");
 
   speedtext = createP("Frame rate: ");
-  speedtext.position((2.8 * windowWidth - 80) / 4, windowHeight - 55);
+  speedtext.position((2.8 * windowWidth - 80) / 4, windowHeight - 40);
   speedtext.style("color: white");
 
   selectFR = createSelect();
-  selectFR.style(
-    "background : transparent; color : white; outline: none; border-color: rgb(200, 0, 200, 100); border-radius: 20px; padding-right: 20px; padding-left: 20px; padding-top: 10px; padding-bottom: 10px"
-  );
+  selectFR.attribute("class", "custom-select-sm");
   selectFR.position((3 * windowWidth) / 4, windowHeight - 50);
   selectFR.option("High");
   selectFR.option("Medium");
@@ -66,7 +62,7 @@ function setup() {
 
   sortButton.mousePressed(() => {
     startSorting = true;
-    sortButton.style("color : grey; border-color: grey;");
+    // sortButton.style("color : grey; border-color: grey;");
     sortButton.attribute("disabled", true);
     slider.attribute("disabled", true);
     swapCheckbox.attribute("disabled", true);
@@ -93,11 +89,8 @@ async function draw() {
   for (let i = 0; i < array.length; i++) {
     stroke(200, 100, 100);
     fill(200, 0, 200, 100);
-    if (!(index_i < array.length - index_j - 1)) {
-      index_i = 0;
-      index_j++;
-    }
-    if ((array[i] && array[i + 1] && i === index_i) || i === index_i + 1) {
+
+    if (i === index_i_select) {
       fill(200, 0, 10, 100);
     }
     rect(i * size, 0, size, array[i]);
@@ -107,38 +100,52 @@ async function draw() {
   if (startSorting) {
     if (apply_sleep) await sleep();
 
-    // BUBBLE SORT
+    // SELECTION SORT
 
-    let swap;
+    if (index_i_select < array.length - 1) {
+      let min_idx = index_i_select;
 
-    if (index_j < array.length - 1) {
-      if (index_i < array.length - index_j - 1) {
-        if (array[index_i] > array[index_i + 1]) {
-          swap = array[index_i];
-          array[index_i] = array[index_i + 1];
-          array[index_i + 1] = swap;
+      for (j = index_i_select + 1; j < array.length; j++)
+        if (array[j] < array[min_idx]) min_idx = j;
 
-          clear();
-          background(50);
-          for (let i = 0; i < array.length; i++) {
-            stroke(200, 100, 100);
-            fill(200, 0, 200, 100);
-            if (
-              (array[i] && array[i + 1] && i === index_i) ||
-              i === index_i + 1
-            ) {
-              fill(10, 0, 100);
-            }
-            rect(i * size, 0, size, array[i]);
-            if (size >= 40) {
-              textSize(12);
-              text(array[i], i * size + size / 4, array[i] - 10);
-            }
-          }
+      clear();
+      background(50);
+      for (let i = 0; i < array.length; i++) {
+        stroke(200, 100, 100);
+        fill(200, 0, 200, 100);
+
+        if (i === index_i_select) {
+          fill(200, 0, 10, 100);
         }
-
-        index_i++;
+        if (i === min_idx) {
+          fill(100, 100, 0, 0);
+        }
+        rect(i * size, 0, size, array[i]);
+        if (size >= 40) text(array[i], i * size + size / 4, array[i] - 10);
       }
+
+      let tmp;
+      tmp = array[min_idx];
+      array[min_idx] = array[index_i_select];
+      array[index_i_select] = tmp;
+
+      clear();
+      background(50);
+      for (let i = 0; i < array.length; i++) {
+        stroke(200, 100, 100);
+        fill(200, 0, 200, 100);
+
+        if (i === min_idx) {
+          fill(100, 100, 0, 0);
+        }
+        if (i === index_i_select) {
+          fill(200, 0, 10, 100);
+        }
+        rect(i * size, 0, size, array[i]);
+        if (size >= 40) text(array[i], i * size + size / 4, array[i] - 10);
+      }
+
+      index_i_select++;
     } else {
       sorted = true;
     }
