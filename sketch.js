@@ -1,4 +1,4 @@
-let index_i_select = 0;
+let curr_size = 1;
 let index_j = 1;
 
 let size = 40; // size of the bars (40 or greater displays numbers)
@@ -26,7 +26,7 @@ function setup() {
   createArray(windowWidth, size);
   frameRate(fr);
 
-  swapCheckbox = createCheckbox("  Enhance Swapping", false);
+  swapCheckbox = createCheckbox("  Enhance Visuals", false);
   swapCheckbox.position(30, windowHeight - 45);
   swapCheckbox.style("color: white;");
   swapCheckbox.changed(() => {
@@ -90,9 +90,6 @@ async function draw() {
     stroke(200, 100, 100);
     fill(200, 0, 200, 100);
 
-    if (i === index_i_select) {
-      fill(200, 0, 10, 100);
-    }
     rect(i * size, 0, size, array[i]);
     if (size >= 40) text(array[i], i * size + size / 4, array[i] - 10);
   }
@@ -100,52 +97,27 @@ async function draw() {
   if (startSorting) {
     if (apply_sleep) await sleep();
 
-    // SELECTION SORT
+    // MERGE SORT
 
-    if (index_i_select < array.length - 1) {
-      let min_idx = index_i_select;
+    if (curr_size < array.length - 1) {
+      for (
+        let left_start = 0;
+        left_start < array.length - 1;
+        left_start += 2 * curr_size
+      ) {
+        // Find ending point of left subarray. mid+1 is starting
+        // point of right
+        var n = array.length;
+        var mid = min(left_start + curr_size - 1, n - 1);
 
-      for (j = index_i_select + 1; j < array.length; j++)
-        if (array[j] < array[min_idx]) min_idx = j;
+        var right_end = min(left_start + 2 * curr_size - 1, n - 1);
 
-      clear();
-      background(50);
-      for (let i = 0; i < array.length; i++) {
-        stroke(200, 100, 100);
-        fill(200, 0, 200, 100);
-
-        if (i === index_i_select) {
-          fill(200, 0, 10, 100);
-        }
-        if (i === min_idx) {
-          fill(100, 100, 0, 0);
-        }
-        rect(i * size, 0, size, array[i]);
-        if (size >= 40) text(array[i], i * size + size / 4, array[i] - 10);
+        // Merge Subarrays arr[left_start...mid] & arr[mid+1...right_end]
+        merge(array, left_start, mid, right_end);
+        // await sleep();
       }
 
-      let tmp;
-      tmp = array[min_idx];
-      array[min_idx] = array[index_i_select];
-      array[index_i_select] = tmp;
-
-      clear();
-      background(50);
-      for (let i = 0; i < array.length; i++) {
-        stroke(200, 100, 100);
-        fill(200, 0, 200, 100);
-
-        if (i === min_idx) {
-          fill(100, 100, 0, 0);
-        }
-        if (i === index_i_select) {
-          fill(200, 0, 10, 100);
-        }
-        rect(i * size, 0, size, array[i]);
-        if (size >= 40) text(array[i], i * size + size / 4, array[i] - 10);
-      }
-
-      index_i_select++;
+      curr_size = 2 * curr_size;
     } else {
       sorted = true;
     }
@@ -155,5 +127,48 @@ async function draw() {
       noLoop();
       return;
     }
+  }
+}
+
+function merge(arr, l, m, r) {
+  var i, j, k;
+  var n1 = m - l + 1;
+  var n2 = r - m;
+
+  /* create temp arrays */
+  var L = [],
+    R = [];
+
+  /* Copy data to temp arrays L[] and R[] */
+  for (i = 0; i < n1; i++) L[i] = arr[l + i];
+  for (j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
+
+  /* Merge the temp arrays back into arr[l..r]*/
+  i = 0;
+  j = 0;
+  k = l;
+  while (i < n1 && j < n2) {
+    if (L[i] <= R[j]) {
+      arr[k] = L[i];
+      i++;
+    } else {
+      arr[k] = R[j];
+      j++;
+    }
+    k++;
+  }
+
+  /* Copy the remaining elements of L[], if there are any */
+  while (i < n1) {
+    arr[k] = L[i];
+    i++;
+    k++;
+  }
+
+  /* Copy the remaining elements of R[], if there are any */
+  while (j < n2) {
+    arr[k] = R[j];
+    j++;
+    k++;
   }
 }
